@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
 use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
 use Mike42\Escpos\Printer;
@@ -37,14 +38,26 @@ class PrintTestCommand extends Command
         /* Information for the receipt */
 
         $items = array(
-            new item("Example item #1", "4.00"),
-            new item("Another thing", "3.50"),
+            new item("Example item #1", "1.00"),
+            new item("Another thing", "2.55"),
             new item("Something else", "1.00"),
-            new item("A final item", "4.45"),
+            new item("A final item", "3.45"),
         );
-        $subtotal = new item('NETTO', '12.95');
-        $tax = new item('PODATEK', '1.30');
-        $total = new item('BRUTTO', '14.25');
+        $sSubTotal = 8.00;
+
+        for ($i = 0; $i < 10; $i++) {
+
+            $price = (string) rand(2,9).rand(2,9).'.'.rand(2,9).rand(2,9);
+            $sSubTotal += floatval($price);
+            $items[] = new item(Str::random(rand(12,20)), $price);
+        }
+        $sTotal =  round($sSubTotal * 1.23,2);
+        $sTax =  round( $sTotal - $sSubTotal,2);
+        $sSubTotal =  round($sSubTotal,2);
+
+        $subtotal = new item('NETTO', $sSubTotal);
+        $tax = new item('PODATEK', $sTax);
+        $total = new item('BRUTTO', $sTotal);
 
         /* Date is kept the same for testing */
         // $date = date('l jS \of F Y h:i:s A');
